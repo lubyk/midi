@@ -7,4 +7,4 @@
 
 --]]------------------------------------------------------
 midi = Autoload('midi')
-require 'midi.vendor'
+require 'midi.core'

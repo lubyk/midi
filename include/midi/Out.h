@@ -29,16 +29,14 @@
 #ifndef LUBYK_INCLUDE_MIDI_OUT_H_
 #define LUBYK_INCLUDE_MIDI_OUT_H_
 
-#include "lubyk.h"
-#include "midi/midi.h"
-
-using namespace lubyk;
+#include "RtMidi.h"
 
 namespace midi {
-/** This class lets you receive midi events through virtual ports (where possible)
- * or connect to midi senders and receive midi data from them.
+/** This class lets you send midi events through virtual ports (where possible)
+ * or connect to midi receivers.
  *
- * @dub lib_name:'Out_core'
+ * @dub push: pushobject
+ *      register: Out_core
  *      string_format:'%%s (%%f)'
  *      string_args:'(*userdata)->portName(), (*userdata)->port()'
  */
@@ -250,9 +248,7 @@ class MidiOut : public Node {
    */
   virtual void bang(const Value &val) {
     const MidiMessage *msg = val.midi_message_;
-    { ScopedLock lock(mutex_);
-      midi_out_->sendMessage( &(msg->data()) );
-    }
+    midi_out_->sendMessage( &(msg->data()) );
     if (msg->type() == NoteOn && msg->length() > 0) {
       Value out(msg); // copy
       out.midi_message_->note_on_to_off();
@@ -363,8 +359,6 @@ private:
    *  object construction.
    */
   Value error_;
-
-  Mutex mutex_;
 };
 
 extern "C" void init(Planet &planet) {

@@ -29,12 +29,9 @@
 #ifndef LUBYK_INCLUDE_MIDI_IN_H_
 #define LUBYK_INCLUDE_MIDI_IN_H_
 
-#include "lubyk.h"
-#include "midi/midi.h"
-#include "lubyk/fifo.h"
+#include "RtMidi.h"
+#include "lubyk/Fifo.h"
 #include <iostream>
-
-using namespace lubyk;
 
 namespace midi {
   typedef std::vector<unsigned char> MsgVector;
@@ -42,12 +39,13 @@ namespace midi {
 /** This class lets you receive midi events through virtual ports (where possible)
  * or connect to midi senders and receive midi data from them.
  *
- * @dub lib_name:'In_core'
+ * @dub push: pushobject
+ *      register: In_core
  *      string_format:'%%s (%%f)'
  *      string_args:'(*userdata)->portName(), (*userdata)->port()'
- *      super: 'lubyk.FifoMethods'
+ *      super: lk.FifoMethods
  */
-class In : public lubyk::Fifo<MsgVector>, public LuaObject {
+class In : public lk::Fifo<MsgVector>, public dub::Thread {
 
 public:
   In()
