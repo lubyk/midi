@@ -12,12 +12,12 @@
 --]]------------------------------------------------------
 require 'lubyk'
 
-local base = lk.dir()
+local base = lk.scriptDir()
 
 local ins = dub.Inspector {
   INPUT    = {
     base .. '/include/midi',
-    base .. '/include/bind',
+    base .. '/bind',
   }
 }
 
@@ -27,14 +27,12 @@ binder:bind(ins, {
   output_directory = base .. '/src/bind',
   -- Remove this part in included headers
   header_base = base .. '/include',
-  -- Execute all lua_open in a single go
-  -- with lua_openmdns (creates midi_core.cpp).
   single_lib = 'midi',
   -- Other name so that we can first load midi.lua
   luaopen = 'midi_core',
   only = {
-    'In',
-    'Out',
+    'midi::In',
+    'midi::Out',
   }
 })
 

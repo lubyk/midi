@@ -10,17 +10,17 @@ require 'lubyk'
 
 local should = test.Suite('midi.Out')
 
-function should.auto_load()
+function should.autoLoad()
   assertTrue(midi.Out)
 end
 
-function should.raise_error_on_bad_port()
+function should.raiseErrorOnBadPort()
   assertError("the 'portNumber' argument .88. is invalid", function()
     midi.Out(88)
   end)
 end
 
-function should.open_port(t)
+function should.openPort(t)
   local mo = midi.Out('lubyk')
   local p_count = 4
   local base = {24, 12, 65, 24}
@@ -28,7 +28,7 @@ function should.open_port(t)
   local vol  = {60, 10, 50, 20}
   sleep(300) -- let DAW host find us
   assertTrue(mo)
-  print(mo:port_name())
+  print(mo:portName())
   io.flush()
   t.players = {}
   t.players[p_count+1] = lk.Timer(125, function()
@@ -55,7 +55,7 @@ function should.open_port(t)
   assertTrue(true)
 end
 
---function should.create_virtual_port()
+--function should.createVirtualPort()
 --  local mi = midi.In('foo')
 --  assertTrue(mi)
 --  print(mi:port())
@@ -70,8 +70,8 @@ end
 --      continue = true
 --    end
 --  end
---  local start = worker:now()
---  while not continue and worker:now() < start + 2000 do
+--  local start = elapsed()
+--  while not continue and elapsed() < start + 2000 do
 --    sleep(10)
 --  end
 --  assertTrue(continue)

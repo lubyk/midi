@@ -38,9 +38,9 @@ namespace midi {
  * @dub push: pushobject
  *      register: Out_core
  *      string_format:'%%s (%%f)'
- *      string_args:'(*userdata)->portName(), (*userdata)->port()'
+ *      string_args:'self->portName(), self->port()'
  */
-class Out {
+class Out : public dub::Thread {
 public:
   Out()
      : port_id_(-1)

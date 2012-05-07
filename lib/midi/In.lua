@@ -6,13 +6,12 @@
   Create/open a midi port.
 
 --]]------------------------------------------------------
-require 'midi.In_core'
+local lib = midi.In_core
+midi.In   = lib
 
-local constr = midi.In
-local mt     = midi.In_
-
-function midi.In(port_or_name, func)
-  local self = constr()
+local new = lib.new
+function lib.new(port_or_name, func)
+  local self = new()
   if type(port_or_name) == 'string' then
     -- open a virtual port
     self:virtualPort(port_or_name)
@@ -26,10 +25,11 @@ function midi.In(port_or_name, func)
   return self
 end
 
-function mt:loop()
+function lib:loop()
   local thread  = self.thread
   local super   = self.super
   local read_fd = self:fd()
+  local sched   = sched
   while thread.should_run do
     sched:waitRead(read_fd)
     self.receive(super:pop())

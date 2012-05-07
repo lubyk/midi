@@ -10,7 +10,7 @@ require 'lubyk'
 
 local should = test.Suite('midi')
 
-function should.auto_load()
+function should.autoLoad()
   assertTrue(midi)
 end
 

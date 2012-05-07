@@ -6,12 +6,12 @@
   Create/open a midi port.
 
 --]]------------------------------------------------------
-require 'midi.Out_core'
-local constr = midi.Out
-local mt     = midi.Out_
+local lib = midi.Out_core
+midi.Out  = lib
 
-function midi.Out(port_or_name)
-  local self = constr()
+local new = lib.new
+function lib.new(port_or_name)
+  local self = new()
   if type(port_or_name) == 'string' then
     -- open a virtual port
     self:virtualPort(port_or_name)
@@ -21,7 +21,7 @@ function midi.Out(port_or_name)
   return self
 end
 
-function mt:sendNote(channel, note, velocity, length)
+function lib:sendNote(channel, note, velocity, length)
   if channel > 16 then
     channel = 16
   elseif channel < 1 then
@@ -43,7 +43,7 @@ function mt:sendNote(channel, note, velocity, length)
   end
 end
 
-function mt:sendAt(time, msg)
+function lib:sendAt(time, msg)
   local prev = self
   local at_top
   -- Get current top event

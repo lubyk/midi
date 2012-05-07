@@ -4,7 +4,7 @@
   ---------
 
   Simplify midi note number manipulation. For example,
-    libote['C0'] => 24.
+    midi.Note['C0'] => 24.
 
   In this system, 'middle' C is C4 (ISO Standard)
 

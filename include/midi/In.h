@@ -42,10 +42,24 @@ namespace midi {
  * @dub push: pushobject
  *      register: In_core
  *      string_format:'%%s (%%f)'
- *      string_args:'(*userdata)->portName(), (*userdata)->port()'
+ *      string_args:'self->portName(), self->port()'
  *      super: lk.FifoMethods
  */
 class In : public lk::Fifo<MsgVector>, public dub::Thread {
+
+  /** Midi port id to which the element is connected.
+   *  If the value is -1 this means it has opened its own virtual port.
+   */
+  int port_id_;
+
+  /** The connected port name.
+   */
+  std::string port_name_;
+
+  /** Pointer to our RtMidiIn instance (midi::In is just a wrapper around
+   *  RtMidiIn).
+   */
+  RtMidiIn *midi_in_;
 
 public:
   In()
@@ -56,7 +70,7 @@ public:
     midi_in_ = new RtMidiIn;
 
     // set callback
-    midi_in_->setCallback(In::s_callback, (void*)this);
+    midi_in_->setCallback(In::sCallback, (void*)this);
   }
 
   ~In() {}
@@ -208,7 +222,7 @@ private:
 
   /** Static callback to trigger when new messages arrive.
    */
-  static void s_callback(double timestamp, MsgVector *message, void *data) {
+  static void sCallback(double timestamp, MsgVector *message, void *data) {
     ((In*)data)->receive(timestamp, message);
   }
 
@@ -249,20 +263,6 @@ private:
   //   }
   //   return true;
   // }
-
-  /** Midi port id to which the element is connected.
-   *  If the value is -1 this means it has opened its own virtual port.
-   */
-  int port_id_;
-
-  /** The connected port name.
-   */
-  std::string port_name_;
-
-  /** Pointer to our RtMidiIn instance (midi::In is just a wrapper around
-   *  RtMidiIn).
-   */
-  RtMidiIn *midi_in_;
 };
 
 } // midi
