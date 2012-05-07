@@ -28,7 +28,7 @@ static int In_In(lua_State *L) {
 }
 
 /** midi::In::~In()
- * include/midi/In.h:77
+ * include/midi/In.h:76
  */
 static int In__In(lua_State *L) {
   try {
@@ -48,7 +48,7 @@ static int In__In(lua_State *L) {
 }
 
 /** int midi::In::port() const
- * include/midi/In.h:79
+ * include/midi/In.h:78
  */
 static int In_port(lua_State *L) {
   try {
@@ -64,7 +64,7 @@ static int In_port(lua_State *L) {
 }
 
 /** const char* midi::In::portName() const
- * include/midi/In.h:83
+ * include/midi/In.h:82
  */
 static int In_portName(lua_State *L) {
   try {
@@ -80,7 +80,7 @@ static int In_portName(lua_State *L) {
 }
 
 /** void midi::In::openPort(int port)
- * include/midi/In.h:87
+ * include/midi/In.h:86
  */
 static int In_openPort(lua_State *L) {
   try {
@@ -104,7 +104,7 @@ static int In_openPort(lua_State *L) {
 }
 
 /** void midi::In::virtualPort(const char *port_name)
- * include/midi/In.h:118
+ * include/midi/In.h:127
  */
 static int In_virtualPort(lua_State *L) {
   try {
