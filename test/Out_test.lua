@@ -9,6 +9,7 @@
 require 'lubyk'
 
 local should = test.Suite('midi.Out')
+local withUser = should:testWithUser()
 
 function should.autoLoad()
   assertTrue(midi.Out)
@@ -20,15 +21,15 @@ function should.raiseErrorOnBadPort()
   end)
 end
 
-function should.openPort(t)
+function withUser.should.openPort(t)
   local mo = midi.Out('lubyk')
   local p_count = 4
   local base = {24, 12, 65, 24}
   local chan = {3,   2,  1, 4}
   local vol  = {60, 10, 50, 20}
   sleep(300) -- let DAW host find us
+  local mi = midi.In('lubyk')
   assertTrue(mo)
-  print(mo:portName())
   io.flush()
   t.players = {}
   t.players[p_count+1] = lk.Timer(125, function()
@@ -50,7 +51,7 @@ function should.openPort(t)
 
   sleep(5000)
   for i=1,p_count+1 do
-    t.players[i]:kill()
+    t.players[i]:stop()
   end
   assertTrue(true)
 end

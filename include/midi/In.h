@@ -41,8 +41,8 @@ namespace midi {
  *
  * @dub push: pushobject
  *      register: In_core
- *      string_format:'%%s (%%f)'
- *      string_args:'self->portName(), self->port()'
+ *      string_format:'%%s'
+ *      string_args:'self->portName()'
  *      super: lk.FifoMethods
  */
 class In : public lk::Fifo<MsgVector>, public dub::Thread {
@@ -76,17 +76,18 @@ public:
   ~In() {}
 
   int port() const {
-    return port_id_;
+    return port_id_ >= 0 ? port_id_ + 1 : port_id_;
   }
 
   const char *portName() const {
     return port_name_.c_str();
   }
 
-  void openPort(int port, lua_State *L) {
+  void openPort(int port) {
+    // 1-based indexing API
+    if (port > 0) port = port - 1;
     if (midi_in_ == NULL) {
-      lua_pushstring(L, "RtMidiIn not initialized: cannot open port.");
-      lua_error(L);
+      throw dub::Exception("RtMidiIn not initialized: cannot open port.");
     }
     midi_in_->closePort();
 
@@ -95,13 +96,21 @@ public:
       midi_in_->openVirtualPort(port_name_);
     } else {
       // try to connect to the given port
-      midi_in_->openPort(port);
+      try {
+        midi_in_->openPort(port);
+      } catch (RtError &e) {
+        if (e.getType() == RtError::INVALID_PARAMETER) {
+          throw dub::Exception("Invalid port number %i.", port >= 0 ? port + 1 : port);
+        } else {
+          throw;
+        }
+      }
       port_name_ = midi_in_->getPortName(port);
     }
     port_id_ = port;
   }
 
-  void openPort(const char *port_name, lua_State *L) {
+  void openPort(const char *port_name) {
     // 1. find port from given name
     int port_count = midi_in_->getPortCount();
     std::string name;
@@ -109,16 +118,15 @@ public:
     for (int i = 0; i < port_count; ++i) {
       name = midi_in_->getPortName(i);
       if (name == port_name) {
-        return openPort(i, L);
+        return openPort(i);
       }
     }
-    lua_pushfstring(L, "Port '%s' not found.", port_name);
-    lua_error(L);
+    throw dub::Exception("Port '%s' not found.", port_name);
   }
 
-  void virtualPort(const char *port_name, lua_State *L) {
+  void virtualPort(const char *port_name) {
     port_name_ = port_name;
-    return openPort(-1, L);
+    return openPort(-1);
   }
 
 protected:
@@ -163,7 +171,21 @@ protected:
       default:
         if (message->size() < 3) return 0;  // error
         // FIXME: other messages not implemented yet.
-        if (channel >= 0x90) {
+        if (channel >= 0xB0) {
+          lua_pushstring(L, "Ctrl");
+          lua_settable(L, -3);
+          lua_pushstring(L, "channel");
+          lua_pushnumber(L, channel - 0xB0 + 1);
+          lua_settable(L, -3);
+          
+          lua_pushstring(L, "ctrl");
+          lua_pushnumber(L, message->at(1));
+          lua_settable(L, -3);
+
+          lua_pushstring(L, "value");
+          lua_pushnumber(L, message->at(2));
+          lua_settable(L, -3);
+        } else if (channel >= 0x90) {
           unsigned int velocity = message->at(2);
           if (velocity > 0) {
             lua_pushstring(L, "NoteOn");
@@ -194,20 +216,6 @@ protected:
           lua_settable(L, -3);
 
           lua_pushstring(L, "velocity");
-          lua_pushnumber(L, message->at(2));
-          lua_settable(L, -3);
-        } else if (channel >= 0xB0) {
-          lua_pushstring(L, "Ctrl");
-          lua_settable(L, -3);
-          lua_pushstring(L, "channel");
-          lua_pushnumber(L, channel - 0x80 + 1);
-          lua_settable(L, -3);
-          
-          lua_pushstring(L, "ctrl");
-          lua_pushnumber(L, message->at(1));
-          lua_settable(L, -3);
-
-          lua_pushstring(L, "value");
           lua_pushnumber(L, message->at(2));
           lua_settable(L, -3);
         } else {  

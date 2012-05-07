@@ -11,23 +11,22 @@ require 'lubyk'
 local should = test.Suite('midi.In')
 local withUser = should:testWithUser()
 
-function should.auto_load()
+function should.autoLoad()
   assertTrue(midi.In)
 end
 
 function should.raiseErrorOnBadPort()
-  assertError("the 'portNumber' argument .88. is invalid", function()
+  assertError("Invalid port number 88.", function()
     midi.In(88)
   end)
 end
 
 function withUser.should.openPort(t)
-  local mi = midi.In(1)
+  local mi = midi.In(3)
   assertTrue(mi)
-  print('Found', mi:portName(), 'please produce midi events...')
   t.continue = false
   local i= 0
-  function mi.receive(msg)
+  function mi:receive(msg)
     print(yaml.dump(msg))
     i = i + 1
     if i > 4 then

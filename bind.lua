@@ -18,7 +18,7 @@ local ins = dub.Inspector {
   INPUT    = {
     base .. '/include/midi',
     base .. '/bind',
-  }
+  },
 }
 
 local binder = dub.LuaBinder()
