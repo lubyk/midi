@@ -118,7 +118,7 @@ public:
     for (int i = 0; i < port_count; ++i) {
       name = midi_in_->getPortName(i);
       if (name == port_name) {
-        return openPort(i);
+        return openPort(i + 1);
       }
     }
     throw dub::Exception("Port '%s' not found.", port_name);
@@ -129,101 +129,29 @@ public:
     return openPort(-1);
   }
 
+  /** List of midi input ports.
+   */
+  static LuaStackSize ports(lua_State * L) {
+    RtMidiIn midi_in;
+    int count = midi_in.getPortCount();
+    lua_newtable(L);
+    int tp = lua_gettop(L);
+    for(int i = 0; i < count; ++i) {
+      std::string name = midi_in.getPortName(i);
+      lua_pushlstring(L, name.c_str(), name.length());
+      lua_rawseti(L, tp, i + 1);
+    }
+    return 1;
+  }
+
 protected:
 
   virtual LuaStackSize unpack(lua_State *L, MsgVector *message) {
     if (message->size() == 0) return 0;  // no message
-    unsigned char channel = message->at(0);
-    
-    lua_newtable(L);
-    // <tbl>
-    // type = 'xxxx'
-    lua_pushstring(L, "type");
-    switch(channel) {
-      case 0xfa:
-        lua_pushstring(L, "Clock");
-        lua_settable(L, -3);
-        lua_pushstring(L, "op");
-        lua_pushstring(L, "Start");
-        lua_settable(L, -3);
-        break;
-      case 0xfc:
-        lua_pushstring(L, "Clock");
-        lua_settable(L, -3);
-        lua_pushstring(L, "op");
-        lua_pushstring(L, "Stop");
-        lua_settable(L, -3);
-        break;
-      case 0xf8:
-        lua_pushstring(L, "Clock");
-        lua_settable(L, -3);
-        lua_pushstring(L, "op");
-        lua_pushstring(L, "Tick");
-        lua_settable(L, -3);
-        break;
-      case 0xfb:
-        lua_pushstring(L, "Clock");
-        lua_settable(L, -3);
-        lua_pushstring(L, "op");
-        lua_pushstring(L, "Continue");
-        lua_settable(L, -3);
-        break;
-      default:
-        if (message->size() < 3) return 0;  // error
-        // FIXME: other messages not implemented yet.
-        if (channel >= 0xB0) {
-          lua_pushstring(L, "Ctrl");
-          lua_settable(L, -3);
-          lua_pushstring(L, "channel");
-          lua_pushnumber(L, channel - 0xB0 + 1);
-          lua_settable(L, -3);
-          
-          lua_pushstring(L, "ctrl");
-          lua_pushnumber(L, message->at(1));
-          lua_settable(L, -3);
-
-          lua_pushstring(L, "value");
-          lua_pushnumber(L, message->at(2));
-          lua_settable(L, -3);
-        } else if (channel >= 0x90) {
-          unsigned int velocity = message->at(2);
-          if (velocity > 0) {
-            lua_pushstring(L, "NoteOn");
-          } else {
-            lua_pushstring(L, "NoteOff");
-          }
-          lua_settable(L, -3);
-          lua_pushstring(L, "channel");
-          lua_pushnumber(L, channel - 0x90 + 1);
-          lua_settable(L, -3);
-
-          lua_pushstring(L, "note");
-          lua_pushnumber(L, message->at(1));
-          lua_settable(L, -3);
-
-          lua_pushstring(L, "velocity");
-          lua_pushnumber(L, velocity);
-          lua_settable(L, -3);
-        } else if (channel >= 0x80) {
-          lua_pushstring(L, "NoteOff");
-          lua_settable(L, -3);
-          lua_pushstring(L, "channel");
-          lua_pushnumber(L, channel - 0x80 + 1);
-          lua_settable(L, -3);
-
-          lua_pushstring(L, "note");
-          lua_pushnumber(L, message->at(1));
-          lua_settable(L, -3);
-
-          lua_pushstring(L, "velocity");
-          lua_pushnumber(L, message->at(2));
-          lua_settable(L, -3);
-        } else {  
-          fprintf(stderr, "unknown message type %i.\n", (int)channel);
-          return 0;
-        }
-    }
-    return 1;
+    lua_pushnumber(L, message->at(0));
+    lua_pushnumber(L, message->at(1));
+    lua_pushnumber(L, message->at(2));
+    return 3;
   }
 
 private:

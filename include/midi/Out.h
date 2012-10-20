@@ -109,6 +109,21 @@ public:
     buffer_[2] = c;
     midi_out_->sendMessage(&buffer_);
   }
+
+  /** List of midi output ports.
+   */
+  static LuaStackSize ports(lua_State * L) {
+    RtMidiIn midi_in;
+    int count = midi_in.getPortCount();
+    lua_newtable(L);
+    int tp = lua_gettop(L);
+    for(int i = 0; i < count; ++i) {
+      std::string name = midi_in.getPortName(i);
+      lua_pushlstring(L, name.c_str(), name.length());
+      lua_rawseti(L, tp, i + 1);
+    }
+    return 1;
+  }
 private:
 
   /** Midi port id to which the element is connected.

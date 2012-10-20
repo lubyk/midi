@@ -120,6 +120,20 @@ static int In_virtualPort(lua_State *L) {
   return dub_error(L);
 }
 
+/** static LuaStackSize midi::In::ports(lua_State *L)
+ * include/midi/In.h:134
+ */
+static int In_ports(lua_State *L) {
+  try {
+    return In::ports(L);
+  } catch (std::exception &e) {
+    lua_pushfstring(L, "ports: %s", e.what());
+  } catch (...) {
+    lua_pushfstring(L, "ports: Unknown exception");
+  }
+  return dub_error(L);
+}
+
 /** int lk::FifoMethods::fd()
  * bind/Fifo.h:10
  */
@@ -170,6 +184,7 @@ static const struct luaL_Reg In_member_methods[] = {
   { "portName"     , In_portName          },
   { "openPort"     , In_openPort          },
   { "virtualPort"  , In_virtualPort       },
+  { "ports"        , In_ports             },
   { "fd"           , In_fd                },
   { "pop"          , In_pop               },
   { "__tostring"   , In___tostring        },

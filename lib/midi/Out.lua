@@ -8,39 +8,15 @@
 --]]------------------------------------------------------
 local lib = midi.Out_core
 midi.Out  = lib
+local private = {}
 
 local new = lib.new
 function lib.new(port_or_name)
   local self = new()
-  if type(port_or_name) == 'string' then
-    -- open a virtual port
-    self:virtualPort(port_or_name)
-  else
+  if port_or_name then
     self:openPort(port_or_name)
   end
   return self
-end
-
-function lib:sendNote(channel, note, velocity, length)
-  if channel > 16 then
-    channel = 16
-  elseif channel < 1 then
-    channel = 1
-  end
-  self:send(
-    -- NoteOn
-    144 + channel - 1,
-    note,
-    velocity
-  )
-  if length then
-    self:sendAt(sched.now + length, {
-      -- NoteOff
-      128 + channel - 1,
-      note,
-      velocity
-    })
-  end
 end
 
 function lib:sendAt(time, msg)
@@ -76,99 +52,13 @@ function lib:sendAt(time, msg)
   end
 end
 
---[[
-  virtual LuaStackSize unpack(lua_State *L, void *data) {
-    MsgVector *message = (MsgVector*)data;
-    if (message.size() == 0) return 0;  // no message
-    
-    lua_newtable(L);
-    // <tbl>
-    // type = 'xxxx'
-    lua_pushstring(L, "type");
-    switch(message[0]) {
-      case 0xfa:
-        lua_pushstring(L, "Clock");
-        lua_settable(L, -3);
-        lua_pushstring(L, "op");
-        lua_pushstring(L, "Start");
-        lua_settable(L, -3);
-        break;
-      case 0xfc:
-        lua_pushstring(L, "Clock");
-        lua_settable(L, -3);
-        lua_pushstring(L, "op");
-        lua_pushstring(L, "Stop");
-        lua_settable(L, -3);
-        break;
-      case 0xf8:
-        lua_pushstring(L, "Clock");
-        lua_settable(L, -3);
-        lua_pushstring(L, "op");
-        lua_pushstring(L, "Tick");
-        lua_settable(L, -3);
-        break;
-      case 0xfb:
-        lua_pushstring(L, "Clock");
-        lua_settable(L, -3);
-        lua_pushstring(L, "op");
-        lua_pushstring(L, "Continue");
-        lua_settable(L, -3);
-        break;
-      default:
-        // FIXME: other messages not implemented yet.
-        unsigned char channel = message[0];
-        if (channel >= 0x90) {
-          unsigned int velocity = message[2];
-          if (velocity > 0) {
-            lua_pushstring(L, "NoteOn");
-          } else {
-            lua_pushstring(L, "NoteOff");
-          }
-          lua_settable(L, -3);
-          lua_pushstring(L, "channel");
-          lua_pushnumber(L, channel - 0x90 + 1);
-          lua_settable(L, -3);
+local send = lib.send
+local decode = midi.Message.decode
+function lib:send(msg, ...)
+  if type(msg) == 'table' then
+    send(self, decode(msg))
+  else
+    send(self, msg, ...)
+  end
+end
 
-          lua_pushstring(L, "note");
-          lua_pushnumber(L, message[1]);
-          lua_settable(L, -3);
-
-          lua_pushstring(L, "velocity");
-          lua_pushnumber(L, velocity);
-          lua_settable(L, -3);
-        } else if (channel >= 0x80) {
-          lua_pushstring(L, "NoteOff");
-          lua_settable(L, -3);
-          lua_pushstring(L, "channel");
-          lua_pushnumber(L, channel - 0x80 + 1);
-          lua_settable(L, -3);
-
-          lua_pushstring(L, "note");
-          lua_pushnumber(L, message[1]);
-          lua_settable(L, -3);
-
-          lua_pushstring(L, "velocity");
-          lua_pushnumber(L, message[2]);
-          lua_settable(L, -3);
-        } else if (channel >= 0xB0) {
-          lua_pushstring(L, "Ctrl");
-          lua_settable(L, -3);
-          lua_pushstring(L, "channel");
-          lua_pushnumber(L, channel - 0x80 + 1);
-          lua_settable(L, -3);
-          
-          lua_pushstring(L, "ctrl");
-          lua_pushnumber(L, message[1]);
-          lua_settable(L, -3);
-
-          lua_pushstring(L, "value");
-          lua_pushnumber(L, message[2]);
-          lua_settable(L, -3);
-        } else {  
-          fprintf(stderr, "unknown message type %i.\n", (int)channel);
-          return 0;
-        }
-    }
-    return 1;
-  }
---]]

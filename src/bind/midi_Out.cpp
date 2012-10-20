@@ -139,6 +139,20 @@ static int Out_send(lua_State *L) {
   return dub_error(L);
 }
 
+/** static LuaStackSize midi::Out::ports(lua_State *L)
+ * include/midi/Out.h:115
+ */
+static int Out_ports(lua_State *L) {
+  try {
+    return Out::ports(L);
+  } catch (std::exception &e) {
+    lua_pushfstring(L, "ports: %s", e.what());
+  } catch (...) {
+    lua_pushfstring(L, "ports: Unknown exception");
+  }
+  return dub_error(L);
+}
+
 
 
 // --=============================================== __tostring
@@ -159,6 +173,7 @@ static const struct luaL_Reg Out_member_methods[] = {
   { "openPort"     , Out_openPort         },
   { "virtualPort"  , Out_virtualPort      },
   { "send"         , Out_send             },
+  { "ports"        , Out_ports            },
   { "__tostring"   , Out___tostring       },
   { "deleted"      , dub_isDeleted        },
   { NULL, NULL},
