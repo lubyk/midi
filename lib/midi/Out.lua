@@ -62,3 +62,12 @@ function lib:send(msg, ...)
   end
 end
 
+function lib:sendNote(chan, note, velo, length)
+  send(self, chan -1 + 0x90, note, velo)
+  if length then
+    -- FIXME: should optimize to avoid creating one thread per note !
+    lk.Thread(function()
+      send(self, chan -1 + 0x80, note, 0)
+    end, now() + length)
+  end
+end

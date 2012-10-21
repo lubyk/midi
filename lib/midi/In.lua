@@ -43,7 +43,10 @@ function private:start()
       self:rawReceive(super:pop())
     end
   end)
-  -- Restart on error in rawReceive.
+  -- Also use dub's error handler for errors in Lua during
+  -- 'rawReceive'.
+  self.thread.error = self._errfunc
+  -- Restart on error.
   self.thread.restart = true
 end
 

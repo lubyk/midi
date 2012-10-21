@@ -120,8 +120,42 @@ static int In_virtualPort(lua_State *L) {
   return dub_error(L);
 }
 
-/** static LuaStackSize midi::In::ports(lua_State *L)
+/** void midi::In::ignoreTypes(bool midiSysex=true, bool midiTime=true, bool midiSense=true)
  * include/midi/In.h:134
+ */
+static int In_ignoreTypes(lua_State *L) {
+  try {
+    In *self = *((In **)dub_checksdata(L, 1, "midi.In"));
+    int top__ = lua_gettop(L);
+    if (top__ >= 4) {
+      bool midiSysex = dub_checkboolean(L, 2);
+      bool midiTime = dub_checkboolean(L, 3);
+      bool midiSense = dub_checkboolean(L, 4);
+      self->ignoreTypes(midiSysex, midiTime, midiSense);
+      return 0;
+    } else if (top__ >= 3) {
+      bool midiSysex = dub_checkboolean(L, 2);
+      bool midiTime = dub_checkboolean(L, 3);
+      self->ignoreTypes(midiSysex, midiTime);
+      return 0;
+    } else if (top__ >= 2) {
+      bool midiSysex = dub_checkboolean(L, 2);
+      self->ignoreTypes(midiSysex);
+      return 0;
+    } else {
+      self->ignoreTypes();
+      return 0;
+    }
+  } catch (std::exception &e) {
+    lua_pushfstring(L, "ignoreTypes: %s", e.what());
+  } catch (...) {
+    lua_pushfstring(L, "ignoreTypes: Unknown exception");
+  }
+  return dub_error(L);
+}
+
+/** static LuaStackSize midi::In::ports(lua_State *L)
+ * include/midi/In.h:140
  */
 static int In_ports(lua_State *L) {
   try {
@@ -184,6 +218,7 @@ static const struct luaL_Reg In_member_methods[] = {
   { "portName"     , In_portName          },
   { "openPort"     , In_openPort          },
   { "virtualPort"  , In_virtualPort       },
+  { "ignoreTypes"  , In_ignoreTypes       },
   { "ports"        , In_ports             },
   { "fd"           , In_fd                },
   { "pop"          , In_pop               },

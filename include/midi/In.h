@@ -129,6 +129,12 @@ public:
     return openPort(-1);
   }
 
+  /** Change types to ignore. By default all special types are ignored.
+   */
+  void ignoreTypes( bool midiSysex = true, bool midiTime = true, bool midiSense = true ) {
+    midi_in_->ignoreTypes(midiSysex, midiTime, midiSense);
+  }
+
   /** List of midi input ports.
    */
   static LuaStackSize ports(lua_State * L) {
@@ -147,11 +153,11 @@ public:
 protected:
 
   virtual LuaStackSize unpack(lua_State *L, MsgVector *message) {
-    if (message->size() == 0) return 0;  // no message
-    lua_pushnumber(L, message->at(0));
-    lua_pushnumber(L, message->at(1));
-    lua_pushnumber(L, message->at(2));
-    return 3;
+    size_t sz = message->size();
+    for(size_t i=0; i < sz; ++i) {
+      lua_pushnumber(L, message->at(i));
+    }
+    return sz;
   }
 
 private:
@@ -164,6 +170,7 @@ private:
 
   inline void receive(double timestamp, MsgVector *message) {
     // push a copy
+    fprintf(stderr, "Receive... %f\n", timestamp);
     if (!push(new MsgVector(*message))) {
       fprintf(stderr, "Midi message buffer full !\n");
     }
