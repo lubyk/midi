@@ -30,10 +30,19 @@ setmetatable(lib, {
 
 function lib.new(a, b, c)
   if a >= 0xF0 then
-    return {
-      type = 'Clock',
-      op   = CLOCK_NB_TO_OP[a],
-    }
+    if a == 0xF2 then
+      return {
+        type = 'Clock',
+        op   = 'Song',
+        -- 1 position step = 6 midi clocks
+        position = b * 128 + c,
+      }
+    else
+      return {
+        type = 'Clock',
+        op   = CLOCK_NB_TO_OP[a],
+      }
+    end
   elseif a >= 0xB0 then
     return {
       type    = 'Ctrl',

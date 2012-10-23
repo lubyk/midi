@@ -170,7 +170,6 @@ private:
 
   inline void receive(double timestamp, MsgVector *message) {
     // push a copy
-    fprintf(stderr, "Receive... %f\n", timestamp);
     if (!push(new MsgVector(*message))) {
       fprintf(stderr, "Midi message buffer full !\n");
     }
