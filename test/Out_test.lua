@@ -95,6 +95,14 @@ function withUser.should.sendChords(t)
   assertTrue(true)
 end
 
+function should.ignoreNil()
+  local out = midi.Out()
+  out:virtualPort('lubyk')
+  assertPass(function()
+    out:send(nil)
+  end)
+end
+
 --function should.createVirtualPort()
 --  local mi = midi.In('foo')
 --  assertTrue(mi)

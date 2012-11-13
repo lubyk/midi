@@ -70,7 +70,7 @@ function lib:send(msg, ...)
       -- midi.Message
       send(self, decode(msg))
     end
-  else
+  elseif msg then
     send(self, msg, ...)
   end
 end
