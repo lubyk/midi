@@ -22,29 +22,38 @@ function should.raiseErrorOnBadPort()
 end
 
 function withUser.should.openPort(t)
-  local mo = midi.Out('lubyk')
-  local p_count = 4
-  local base = {24, 12, 65, 24}
-  local chan = {3,   2,  1, 4}
-  local vol  = {60, 10, 50, 20}
+  local mo = midi.Out()
+  mo:virtualPort('lubyk')
+  local p_count = 6
+  local base = {24, 12, 65, 24, 67, 72}
+  local chan = {3,   2,  1, 4,  1,  2}
+  local vol  = {60, 10, 50, 20, 40, 40}
   sleep(300) -- let DAW host find us
   local mi = midi.In('lubyk')
+  local notes = {}
   assertTrue(mo)
   io.flush()
   t.players = {}
   t.players[p_count+1] = lk.Timer(125, function()
-    mo:send(143+chan[1], 37, 0)
-    mo:send(143+chan[1], 37, 60)
+    local n = 37
+    local off = {127+chan[1], n, 0}
+    notes[n] = off
+    mo:send(143+chan[1], n, 60)
+    sleep(60)
+    notes[n] = false
+    mo:send(unpack(off))
   end)
-  t.players[p_count+1]:start()
+
   for i=1,p_count do
-    local n1 = base[i]
-    mo:send(143+chan[i], n1, vol[i] + vol[i]*math.random())
-    t.players[i] = lk.Timer(10, function()
-      mo:send(143+chan[i], n1, 0)
-      n1 = base[i] + 24*math.random()
-      mo:send(143+chan[i], n1, vol[i] + vol[i]*math.random())
-      return 80 + 130*math.random()
+    t.players[i] = lk.Timer(250, function()
+      local n = base[i] + 24*math.random()
+      local off = {127+chan[i], n, 0}
+      mo:send(143+chan[i], n, vol[i] * (1 + math.random()))
+      notes[n] = off
+      sleep(100 + 50*math.random())
+      notes[n] = false
+      mo:send(unpack(off))
+      return 200 + 130*math.random()
     end)
     t.players[i]:start()
   end
@@ -53,6 +62,36 @@ function withUser.should.openPort(t)
   for i=1,p_count+1 do
     t.players[i]:stop()
   end
+
+  for n, s in pairs(notes) do
+    if s then
+      mo:send(unpack(s))
+    end
+  end
+  assertTrue(true)
+end
+
+function withUser.should.sendChords(t)
+  local mo = midi.Out()
+  mo:virtualPort('lubyk')
+  sleep(2000)
+  t.timer = lk.Timer(500, function()
+    mo:send {
+      {143+1, 60, 80},
+      {143+1, 63, 70},
+      {143+1, 67, 90},
+    }
+    sleep(250)
+    mo:send {
+      -- NoteOff
+      {127+1, 60, 0},
+      {127+1, 63, 0},
+      {127+1, 67, 0},
+    }
+  end)
+  t.timer:start()
+  sleep(4400)
+  t.timer:stop()
   assertTrue(true)
 end
 

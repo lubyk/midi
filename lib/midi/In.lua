@@ -51,6 +51,10 @@ function private:start()
 end
 
 -- Default dummy function
+function lib:receive(msg)
+end
+
+-- Default dummy function
 function lib:rawReceive(a, b, c)
   self:receive(midi.Message(a, b, c))
 end

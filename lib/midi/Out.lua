@@ -56,7 +56,20 @@ local send = lib.send
 local decode = midi.Message.decode
 function lib:send(msg, ...)
   if type(msg) == 'table' then
-    send(self, decode(msg))
+    if msg[1] then
+      -- table is a list = chord
+      for _, m in ipairs(msg) do
+        if m[1] then
+          send(self, unpack(m))
+        else
+          -- midi.Message
+          send(self, decode(m))
+        end
+      end
+    else
+      -- midi.Message
+      send(self, decode(msg))
+    end
   else
     send(self, msg, ...)
   end

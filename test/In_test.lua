@@ -59,9 +59,9 @@ function withUser.should.createVirtualPort(t)
 end
 
 function should.listInputPorts()
-  local inputs = midi.In.inputPorts()
+  local inputs = midi.In.ports()
   assertType('table', inputs)
-  print(yaml.dump(inputs))
+  assertType('string', inputs[1])
 end
 
 test.all()
