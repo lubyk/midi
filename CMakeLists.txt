@@ -8,6 +8,7 @@
 set(MODULE_NAME midi)
 
 include_directories(include)
+include_directories(../core/include)
 # --------------------------------------------------------------
 #  module
 # --------------------------------------------------------------

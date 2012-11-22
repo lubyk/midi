@@ -30,7 +30,7 @@
 #define LUBYK_INCLUDE_MIDI_IN_H_
 
 #include "RtMidi.h"
-#include "lubyk/Fifo.h"
+#include "lk/Fifo.h"
 #include <iostream>
 
 namespace midi {

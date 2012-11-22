@@ -76,7 +76,8 @@ public:
       midi_out_->openVirtualPort(port_name_);
     } else {
       // try to connect to the given port
-      midi_out_->openPort(port);
+      // zero based index
+      midi_out_->openPort(port - 1);
       port_name_ = midi_out_->getPortName(port);
     }
     port_id_ = port;
@@ -90,7 +91,7 @@ public:
     for (int i = 0; i < port_count; ++i) {
       name = midi_out_->getPortName(i);
       if (name == port_name) {
-        return openPort(i, L);
+        return openPort(i + 1, L);
       }
     }
     lua_pushfstring(L, "Port '%s' not found.", port_name);
