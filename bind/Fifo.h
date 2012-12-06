@@ -9,6 +9,7 @@ class FifoMethods {
 public:
   int fd();
   LuaStackSize pop(lua_State *L);
+  bool hasMessage();
 };
 }
 

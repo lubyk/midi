@@ -20,9 +20,9 @@ static int Out_Out(lua_State *L) {
     retval__->pushobject(L, retval__, "midi.Out", true);
     return 1;
   } catch (std::exception &e) {
-    lua_pushfstring(L, "Out: %s", e.what());
+    lua_pushfstring(L, "new: %s", e.what());
   } catch (...) {
-    lua_pushfstring(L, "Out: Unknown exception");
+    lua_pushfstring(L, "new: Unknown exception");
   }
   return dub_error(L);
 }
@@ -40,9 +40,9 @@ static int Out__Out(lua_State *L) {
     userdata->gc = false;
     return 0;
   } catch (std::exception &e) {
-    lua_pushfstring(L, "~Out: %s", e.what());
+    lua_pushfstring(L, "__gc: %s", e.what());
   } catch (...) {
-    lua_pushfstring(L, "~Out: Unknown exception");
+    lua_pushfstring(L, "__gc: Unknown exception");
   }
   return dub_error(L);
 }
@@ -104,7 +104,7 @@ static int Out_openPort(lua_State *L) {
 }
 
 /** void midi::Out::virtualPort(const char *port_name, lua_State *L)
- * include/midi/Out.h:100
+ * include/midi/Out.h:101
  */
 static int Out_virtualPort(lua_State *L) {
   try {
@@ -121,7 +121,7 @@ static int Out_virtualPort(lua_State *L) {
 }
 
 /** void midi::Out::send(int a, int b, int c)
- * include/midi/Out.h:105
+ * include/midi/Out.h:106
  */
 static int Out_send(lua_State *L) {
   try {
@@ -140,7 +140,7 @@ static int Out_send(lua_State *L) {
 }
 
 /** static LuaStackSize midi::Out::ports(lua_State *L)
- * include/midi/Out.h:115
+ * include/midi/Out.h:116
  */
 static int Out_ports(lua_State *L) {
   try {

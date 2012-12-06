@@ -20,9 +20,9 @@ static int In_In(lua_State *L) {
     retval__->pushobject(L, retval__, "midi.In", true);
     return 1;
   } catch (std::exception &e) {
-    lua_pushfstring(L, "In: %s", e.what());
+    lua_pushfstring(L, "new: %s", e.what());
   } catch (...) {
-    lua_pushfstring(L, "In: Unknown exception");
+    lua_pushfstring(L, "new: Unknown exception");
   }
   return dub_error(L);
 }
@@ -40,9 +40,9 @@ static int In__In(lua_State *L) {
     userdata->gc = false;
     return 0;
   } catch (std::exception &e) {
-    lua_pushfstring(L, "~In: %s", e.what());
+    lua_pushfstring(L, "__gc: %s", e.what());
   } catch (...) {
-    lua_pushfstring(L, "~In: Unknown exception");
+    lua_pushfstring(L, "__gc: Unknown exception");
   }
   return dub_error(L);
 }
@@ -199,6 +199,22 @@ static int In_pop(lua_State *L) {
   return dub_error(L);
 }
 
+/** bool lk::FifoMethods::hasMessage()
+ * bind/Fifo.h:12
+ */
+static int In_hasMessage(lua_State *L) {
+  try {
+    In *self = *((In **)dub_checksdata(L, 1, "midi.In"));
+    lua_pushboolean(L, self->hasMessage());
+    return 1;
+  } catch (std::exception &e) {
+    lua_pushfstring(L, "hasMessage: %s", e.what());
+  } catch (...) {
+    lua_pushfstring(L, "hasMessage: Unknown exception");
+  }
+  return dub_error(L);
+}
+
 
 
 // --=============================================== __tostring
@@ -222,6 +238,7 @@ static const struct luaL_Reg In_member_methods[] = {
   { "ports"        , In_ports             },
   { "fd"           , In_fd                },
   { "pop"          , In_pop               },
+  { "hasMessage"   , In_hasMessage        },
   { "__tostring"   , In___tostring        },
   { "deleted"      , dub_isDeleted        },
   { NULL, NULL},
