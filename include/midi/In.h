@@ -73,7 +73,12 @@ public:
     midi_in_->setCallback(In::sCallback, (void*)this);
   }
 
-  ~In() {}
+  ~In() {
+    if (midi_in_) {
+      midi_in_->closePort();
+      delete midi_in_;
+    }
+  }
 
   int port() const {
     return port_id_ >= 0 ? port_id_ + 1 : port_id_;

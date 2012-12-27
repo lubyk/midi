@@ -15,6 +15,13 @@ file(GLOB SOURCES bind/dub/*.cpp bind/*.cpp vendor/*.cpp)
 if(MODULES_STATIC)
   set(target "${MODULE_NAME}_static")
   add_library(${target} ${SOURCES})
+
+  # --------------------------------------------------------------
+  #  .a
+  # --------------------------------------------------------------
+  install(TARGETS "${MODULE_NAME}_static"
+    DESTINATION ${MODULES_STATIC}
+  )
 else(MODULES_STATIC)
   set(target "${MODULE_NAME}_core")
   # --------------------------------------------------------------

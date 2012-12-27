@@ -52,6 +52,7 @@ public:
 
   ~Out() {
     if (midi_out_) {
+      midi_out_->closePort();
       delete midi_out_;
     }
   }
