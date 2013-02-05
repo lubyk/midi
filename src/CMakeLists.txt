@@ -30,7 +30,7 @@ else(MODULES_STATIC)
   add_library(${target} MODULE ${SOURCES})
   set_target_properties(${target} PROPERTIES
     OUTPUT_NAME core
-    LINK_FLAGS "${PLAT_OBJ_FLAGS} -framework CoreMIDI -framework CoreAudio"
+    LINK_FLAGS ${PLAT_OBJ_FLAGS}
     PREFIX ""
     SUFFIX ".so"
   )

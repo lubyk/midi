@@ -17,6 +17,10 @@ add_custom_target(${MODULE_NAME} true)
 # --------------------------------------------------------------
 #  src
 # --------------------------------------------------------------
+if(APPLE)
+  set(PLAT_OBJ_FLAGS "${PLAT_OBJ_FLAGS} -framework CoreMIDI -framework CoreAudio")
+endif(APPLE)
+
 add_subdirectory(src)
 
 # --------------------------------------------------------------
