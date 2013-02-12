@@ -84,3 +84,13 @@ function lib:sendNote(chan, note, velo, length)
     end, now() + length)
   end
 end
+lib.sendNoteOn = lib.sendNote
+
+function lib:sendNoteOff(chan, note, velo)
+  send(self, chan -1 + 0x80, note, velo or 0)
+end
+
+function lib:sendCtrl(chan, ctrl, value)
+  send(self, chan -1 + 0xB0, ctrl, value)
+end
+
