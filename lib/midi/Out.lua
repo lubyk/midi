@@ -75,6 +75,7 @@ function lib:send(msg, ...)
   end
 end
 
+-- Length must be in seconds.
 function lib:sendNote(chan, note, velo, length)
   send(self, chan -1 + 0x90, note, velo)
   if length then
