@@ -176,6 +176,7 @@ private:
   inline void receive(double timestamp, MsgVector *message) {
     // push a copy
     if (!push(new MsgVector(*message))) {
+      // data deleted by Fifo.
       fprintf(stderr, "Midi message buffer full !\n");
     }
   }
